@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">mp3player</string>
+    <string name="drawer_open">DrawerLayout Open</string>
+    <string name="drawer_close">DrawerLayout Close</string>
+</resources>
