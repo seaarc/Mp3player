@@ -13,7 +13,8 @@
         android:layout_height="200dp"
         android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
         android:background="@color/white">
-        <!-- CollapsionToolbarLayout 개별 뷰 각각의 스크롤 설정  -->
+
+        <!-- CollapsingToolbarLayout 개별 뷰 각각의 스크롤 설정  -->
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="200dp"
@@ -21,7 +22,7 @@
             app:expandedTitleTextColor="#554761"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:title="세부 정보">
-            <!-- 뷰를 구현하고, 스크롤 결정 -->
+            <!-- 툴바 -->
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -31,166 +32,176 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="20dp"
+        android:layout_height="wrap_content"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="200dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/albumart" />
-
-        <TextView
-            android:id="@+id/tvDtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="제목"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="@+id/imageView"
-            app:layout_constraintTop_toBottomOf="@+id/imageView" />
-
-        <TextView
-            android:id="@+id/detailTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="제목"
-            android:textColor="#554761"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="@+id/tvDtitle"
-            app:layout_constraintTop_toBottomOf="@+id/tvDtitle" />
-
-        <View
-            android:id="@+id/divider1"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="15dp"
-            android:background="?android:attr/listDivider"
-            app:layout_constraintTop_toBottomOf="@+id/detailTitle"
-            tools:layout_editor_absoluteX="1dp" />
+            android:layout_height="match_parent"
+            android:padding="20dp"
+            android:scrollbars="vertical"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <TextView
-            android:id="@+id/tvDAlbum"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="앨범"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="@+id/divider1"
-            app:layout_constraintTop_toBottomOf="@+id/divider1" />
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/albumart" />
 
-        <TextView
-            android:id="@+id/detailAlbum"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="앨범"
-            android:textColor="#554761"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="@+id/tvDAlbum"
-            app:layout_constraintTop_toBottomOf="@+id/tvDAlbum" />
+            <TextView
+                android:id="@+id/tvDtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="제목"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
-        <View
-            android:id="@+id/divider2"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="15dp"
-            android:background="?android:attr/listDivider"
-            app:layout_constraintStart_toStartOf="@+id/detailAlbum"
-            app:layout_constraintTop_toBottomOf="@+id/detailAlbum" />
+            <TextView
+                android:id="@+id/detailTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="제목"
+                android:textColor="#554761"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="@+id/tvDtitle"
+                app:layout_constraintTop_toBottomOf="@+id/tvDtitle" />
 
-        <TextView
-            android:id="@+id/tvDTrack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="트랙"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="@+id/divider2"
-            app:layout_constraintTop_toBottomOf="@+id/divider2" />
+            <View
+                android:id="@+id/divider1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="15dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintTop_toBottomOf="@+id/detailTitle"
+                tools:layout_editor_absoluteX="1dp" />
 
-        <TextView
-            android:id="@+id/detailTrack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="트랙"
-            android:textColor="#554761"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="@+id/tvDTrack"
-            app:layout_constraintTop_toBottomOf="@+id/tvDTrack" />
+            <TextView
+                android:id="@+id/tvDAlbum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="앨범"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/divider1"
+                app:layout_constraintTop_toBottomOf="@+id/divider1" />
 
-        <View
-            android:id="@+id/divider3"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="15dp"
-            android:background="?android:attr/listDivider"
-            app:layout_constraintStart_toStartOf="@+id/detailTrack"
-            app:layout_constraintTop_toBottomOf="@+id/detailTrack" />
+            <TextView
+                android:id="@+id/detailAlbum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="앨범"
+                android:textColor="#554761"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="@+id/tvDAlbum"
+                app:layout_constraintTop_toBottomOf="@+id/tvDAlbum" />
 
-        <TextView
-            android:id="@+id/tvDArtist"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="아티스트"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="@+id/divider3"
-            app:layout_constraintTop_toBottomOf="@+id/divider3" />
+            <View
+                android:id="@+id/divider2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="15dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintStart_toStartOf="@+id/detailAlbum"
+                app:layout_constraintTop_toBottomOf="@+id/detailAlbum" />
 
-        <TextView
-            android:id="@+id/detailAtrist"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="아티스트"
-            android:textColor="#554761"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="@+id/tvDArtist"
-            app:layout_constraintTop_toBottomOf="@+id/tvDArtist" />
+            <TextView
+                android:id="@+id/tvDTrack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="트랙"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/divider2"
+                app:layout_constraintTop_toBottomOf="@+id/divider2" />
 
-        <View
-            android:id="@+id/divider4"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="15dp"
-            android:background="?android:attr/listDivider"
-            app:layout_constraintStart_toStartOf="@+id/detailAtrist"
-            app:layout_constraintTop_toBottomOf="@+id/detailAtrist" />
+            <TextView
+                android:id="@+id/detailTrack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="트랙"
+                android:textColor="#554761"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="@+id/tvDTrack"
+                app:layout_constraintTop_toBottomOf="@+id/tvDTrack" />
 
-        <TextView
-            android:id="@+id/tvDDuration"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="재생 시간"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="@+id/divider4"
-            app:layout_constraintTop_toBottomOf="@+id/divider4" />
+            <View
+                android:id="@+id/divider3"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="15dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintStart_toStartOf="@+id/detailTrack"
+                app:layout_constraintTop_toBottomOf="@+id/detailTrack" />
 
-        <TextView
-            android:id="@+id/detailDuration"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="재생 시간"
-            android:textColor="#554761"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="@+id/tvDDuration"
-            app:layout_constraintTop_toBottomOf="@+id/tvDDuration" />
+            <TextView
+                android:id="@+id/tvDArtist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="아티스트"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/divider3"
+                app:layout_constraintTop_toBottomOf="@+id/divider3" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/detailArtist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="아티스트"
+                android:textColor="#554761"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="@+id/tvDArtist"
+                app:layout_constraintTop_toBottomOf="@+id/tvDArtist" />
+
+            <View
+                android:id="@+id/divider4"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="15dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintStart_toStartOf="@+id/detailArtist"
+                app:layout_constraintTop_toBottomOf="@+id/detailArtist" />
+
+            <TextView
+                android:id="@+id/tvDDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="재생 시간"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/divider4"
+                app:layout_constraintTop_toBottomOf="@+id/divider4" />
+
+            <TextView
+                android:id="@+id/detailDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="재생 시간"
+                android:textColor="#554761"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="@+id/tvDDuration"
+                app:layout_constraintTop_toBottomOf="@+id/tvDDuration" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

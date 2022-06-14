@@ -1,7 +1,9 @@
 package com.example.mp3player
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +12,8 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.palette.graphics.Palette
 import com.example.mp3player.databinding.ActivityPlayBinding
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
@@ -29,6 +33,7 @@ class PlayActivity : AppCompatActivity() {
     private var playerJob: Job? = null
     // 데이터베이스 객체화
     val dbHelper by lazy { DBHelper(this, DBHelper.VERSION) }
+    var adapter: RecyclerAdapter? = null
 
     var playList: MutableList<Music> = mutableListOf<Music>()
     var from = ""
@@ -87,8 +92,13 @@ class PlayActivity : AppCompatActivity() {
 
             // 뷰 설정 - 앨범아트
             val bitmap: Bitmap? = track.getAlbumArt(this, ALBUMART_WIDTH, ALBUMART_HEIGHT)
-            if(bitmap != null) binding.ivAlbumArt.setImageBitmap(bitmap)
+            if(bitmap != null) {
+                binding.ivAlbumArt.setImageBitmap(bitmap)
+                setBackground(bitmap)
+            }
             else binding.ivAlbumArt.setImageResource(R.drawable.albumart)
+
+
 
             // 즐겨찾기 상태
             if(track.favorites == 0) binding.ivFavorites.setImageResource(R.drawable.star_border_24)
@@ -165,7 +175,7 @@ class PlayActivity : AppCompatActivity() {
             // 처음으로 / 이전 곡으로 넘기기
             R.id.ivPrevious -> {
                 var start: Long = 0L
-                if(mediaPlayer!!.currentPosition > 0) {
+                if(mediaPlayer!!.currentPosition > 3000) {
                     // 음악 시작으로 돌아가며 seekBar 초기화
                     binding.seekBar.progress = 0
                     mediaPlayer!!.seekTo(0)
@@ -183,6 +193,8 @@ class PlayActivity : AppCompatActivity() {
             // 다음 곡으로 넘기기
             R.id.ivNext -> {
                 mediaPlayer!!.seekTo(binding.seekBar.max)
+                Log.d("log", "seekBar max = ${binding.seekBar.max}")
+                Log.d("log", "mediaPlayer!!.currentPosition = ${mediaPlayer!!.currentPosition}")
                 playNext()
             }
 
@@ -199,6 +211,11 @@ class PlayActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateFav() {
+        // adapter?.notifyDataSetChanged()
     }
 
     // 음악이 시작됐을 때 1) seekBar 이동 2) 경과 시간 변동 3) 음악 진행 => 코루틴 사용
@@ -277,8 +294,6 @@ class PlayActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         mediaPlayer?.stop()
-        // 코루틴 해제
-        playerJob?.cancel()
     }
 
     override fun onStop() {
@@ -290,6 +305,50 @@ class PlayActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         mediaPlayer?.release()
+    }
+
+    // Palette API
+    fun createPaletteSync(bitmap: Bitmap): Palette = Palette.from(bitmap).generate()
+
+    @SuppressLint("ResourceAsColor")
+    fun setBackground(bitmap: Bitmap) {
+        val dominantSwatch = createPaletteSync(bitmap).dominantSwatch
+        val vibrantSwatch = createPaletteSync(bitmap).vibrantSwatch
+
+        with(binding) {
+            playbackground.setBackgroundColor(dominantSwatch?.rgb ?:
+            ContextCompat.getColor(this@PlayActivity, R.color.white))
+
+            // 화면 밝기
+            if(dominantSwatch != null) {
+                val light = dominantSwatch.hsl[2]
+                if(light <= 0.5) {
+                    // 화면이 어두울 때
+                    tvTitle.setTextColor(Color.WHITE)
+                    tvArtist.setTextColor(Color.LTGRAY)
+                    tvDurationStart.setTextColor(Color.LTGRAY)
+                    tvDurationEnd.setTextColor(Color.LTGRAY)
+                    ivPlay.setColorFilter(resources.getColor(R.color.white))
+                    ivPrevious.setColorFilter(resources.getColor(R.color.white))
+                    ivNext.setColorFilter(resources.getColor(R.color.white))
+                    ivFavorites.setColorFilter(resources.getColor(R.color.white))
+                    ivRepeat.setColorFilter(resources.getColor(R.color.white))
+                    ivList.setColorFilter(resources.getColor(R.color.white))
+                }else {
+                    // 화면이 밝을 때
+                    tvTitle.setTextColor(Color.BLACK)
+                    tvArtist.setTextColor(Color.DKGRAY)
+                    tvDurationStart.setTextColor(Color.DKGRAY)
+                    tvDurationEnd.setTextColor(Color.DKGRAY)
+                    ivPlay.setColorFilter(resources.getColor(R.color.black))
+                    ivPrevious.setColorFilter(resources.getColor(R.color.black))
+                    ivNext.setColorFilter(resources.getColor(R.color.black))
+                    ivFavorites.setColorFilter(resources.getColor(R.color.black))
+                    ivRepeat.setColorFilter(resources.getColor(R.color.black))
+                    ivList.setColorFilter(resources.getColor(R.color.black))
+                }
+            }
+        }
     }
 
 }

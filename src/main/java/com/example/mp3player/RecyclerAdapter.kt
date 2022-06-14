@@ -43,7 +43,6 @@ class RecyclerAdapter(val context: Context, val playList: MutableList<Music>): R
         viewHolder.itemView.setOnLongClickListener {
             var position = viewHolder.adapterPosition
             (parent.context as MainActivity).deleteMusic(position)
-            notifyDataSetChanged()
             Log.d("log", "삭제 포지션: $position")
             return@setOnLongClickListener true
         }
@@ -52,7 +51,9 @@ class RecyclerAdapter(val context: Context, val playList: MutableList<Music>): R
     }
 
     // 화면에 표시된 뷰에 데이터를 넣기
+    @SuppressLint("NotifyDataSetChanged")
     override fun onBindViewHolder(holder: MuViewHolder, position: Int) {
+
         val binding = holder.binding
         val music = playList[position]
         binding.liTitle.text = music.title

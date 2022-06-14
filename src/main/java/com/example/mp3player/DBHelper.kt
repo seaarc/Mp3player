@@ -16,7 +16,7 @@ class DBHelper(context: Context, version: Int): SQLiteOpenHelper(context, "playm
 
     // 테이블 설계
     override fun onCreate(db: SQLiteDatabase?) {
-        val createQuery = "create table ${TBL_NAME}(id text primary key, title text, artist text, albumId text, duration integer, favorites integer)"
+        val createQuery = "create table ${TBL_NAME}(id text primary key, title text, artist text, albumId text, duration integer, favorites integer, albumName text, track text)"
         db?.execSQL(createQuery)
     }
 
@@ -32,14 +32,14 @@ class DBHelper(context: Context, version: Int): SQLiteOpenHelper(context, "playm
     fun insertData(music: Music):Boolean {
         val db = this.writableDatabase
         var insertFlag = false
-        val insertQuery = "insert into ${TBL_NAME}(id, title, artist, albumId, duration, favorites)" +
-                "values('${music.id}', '${music.title}', '${music.artist}', '${music.albumId}', ${music.duration}, ${music.favorites})"
+        val insertQuery = "insert into ${TBL_NAME}(id, title, artist, albumId, duration, favorites, albumName, track)" +
+                "values('${music.id}', '${music.title}', '${music.artist}', '${music.albumId}', ${music.duration}, ${music.favorites}, '${music.albumName}', '${music.track}')"
 
         try {
             db.execSQL(insertQuery)
             insertFlag = true
         }catch (e: SQLException){
-            Log.d("log","SQLException Error: ${e.printStackTrace()}")
+            Log.d("log","Insert SQLException Error: ${e.printStackTrace()}")
         }finally {
             db.close()
         }
@@ -63,15 +63,17 @@ class DBHelper(context: Context, version: Int): SQLiteOpenHelper(context, "playm
                     val id = cursor.getString(0)
                     val title = cursor.getString(1)
                     val artist = cursor.getString(2)
-                    val albumID = cursor.getString(3)
+                    val albumId = cursor.getString(3)
                     val duration = cursor.getLong(4)
                     val favorites = cursor.getInt(5)
-                    val music = Music(id, title, artist, albumID, duration, favorites)
+                    val albumName = cursor.getString(6)
+                    val track = cursor.getString(7)
+                    val music = Music(id, title, artist, albumId, duration, favorites, albumName, track)
                     musicList.add(music)
                 }
             }
         }catch (e: Exception){
-            Log.d("log", "${e.printStackTrace()}")
+            Log.d("log", "SelectAllData error: ${e.printStackTrace()}")
         }finally {
             cursor?.close()
             db.close()
@@ -97,12 +99,14 @@ class DBHelper(context: Context, version: Int): SQLiteOpenHelper(context, "playm
                     val albumId = cursor.getString(3)
                     val duration = cursor.getLong(4)
                     val favorites = cursor.getInt(5)
-                    val music = Music(id, title, artist, albumId, duration, favorites)
+                    val albumName = cursor.getString(6)
+                    val track = cursor.getString(7)
+                    val music = Music(id, title, artist, albumId, duration, favorites, albumName, track)
                     musicList.add(music)
                 }
             }
         } catch (e: Exception){
-            Log.d("log", "${e.printStackTrace()}")
+            Log.d("log", "SelectData error: ${e.printStackTrace()}")
         } finally {
             cursor?.close()
             db.close()
@@ -116,12 +120,11 @@ class DBHelper(context: Context, version: Int): SQLiteOpenHelper(context, "playm
         val db = this.writableDatabase
         var deleteFlag = false
         val deleteQuery = "delete from $TBL_NAME where id = '$id'"
-        Log.d("log", "삭제하라고 전달받은 $id")
         try {
             db.execSQL(deleteQuery)
             deleteFlag = true
         }catch (e: Exception) {
-            Log.d("log", "${e.printStackTrace()}")
+            Log.d("log", "DeleteData error: ${e.printStackTrace()}")
         }finally {
             db.close()
         }
@@ -139,7 +142,7 @@ class DBHelper(context: Context, version: Int): SQLiteOpenHelper(context, "playm
             Log.d("log", "등록한 페이버릿: ${music.favorites}")
             updateFlag = true
         }catch (e: SQLException){
-            Log.d("log","SQLException Error: ${e.printStackTrace()}")
+            Log.d("log","UpdateFavorites SQLException Error: ${e.printStackTrace()}")
         }
 
         return updateFlag
@@ -163,11 +166,13 @@ class DBHelper(context: Context, version: Int): SQLiteOpenHelper(context, "playm
                     val albumId = cursor.getString(3)
                     val duration = cursor.getLong(4)
                     val favorites = cursor.getInt(5)
-                    favoritesList.add(Music(id, title, artist, albumId, duration, favorites))
+                    val albumName = cursor.getString(6)
+                    val track = cursor.getString(7)
+                    favoritesList.add(Music(id, title, artist, albumId, duration, favorites, albumName, track))
                 }
             }
         } catch (e: Exception) {
-            Log.d("log", "에러 ${e.printStackTrace()}")
+            Log.d("log", "SelectFavorite error: ${e.printStackTrace()}")
         } finally {
             cursor?.close()
             db.close()

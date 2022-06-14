@@ -11,7 +11,7 @@ import android.util.Log
 import java.io.IOException
 import java.io.Serializable
 
-class Music(var id: String, var title: String?, var artist: String?, var albumId: String?, var duration: Long?, var favorites: Int): Serializable {
+class Music(var id: String, var title: String?, var artist: String?, var albumId: String?, var duration: Long?, var favorites: Int, var albumName: String?, var track: String?): Serializable {
 
     // contents resolver를 이용해 앨범 정보의 url을 가져옴
     fun getAlbumUri(): Uri {

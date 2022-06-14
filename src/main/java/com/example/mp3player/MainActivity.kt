@@ -1,5 +1,8 @@
 package com.example.mp3player
 
+import android.annotation.SuppressLint
+import android.app.Dialog
+import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.MediaStore
@@ -8,6 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
@@ -26,6 +30,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     // musicList
     var playList: MutableList<Music> = mutableListOf<Music>()
     var searchedList: MutableList<Music> = mutableListOf<Music>()
+    var favoriteList: MutableList<Music> = mutableListOf<Music>()
     // 토글
     lateinit var toggle: ActionBarDrawerToggle
 
@@ -36,6 +41,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
 
         // 툴바
         setSupportActionBar(binding.toolbarMain)
@@ -111,9 +117,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onRestart() {
         super.onRestart()
         // 데이터 갱신
-        // PlayActivity().updateFav()
+         // PlayActivity().updateFav()
         playList = dbHelper.selectAllData()
         binding.recyclerview.adapter = RecyclerAdapter(this, playList)
+        binding.toolbarMain.title = "음악"
+
+        favoriteList = dbHelper.selectFavorite()
+        // binding.recyclerview.adapter = FavoriteAdapter(this@MainActivity, favoriteList)
     }
 
     // 옵션 메뉴 생성
@@ -168,7 +178,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
             R.id.favoritesList -> {
-                val favoriteList = dbHelper.selectFavorite()
+                favoriteList = dbHelper.selectFavorite()
                 binding.recyclerview.adapter = FavoriteAdapter(this@MainActivity, favoriteList)
                 binding.toolbarMain.title = "즐겨찾기"
             }
@@ -185,10 +195,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // 요청할 음원 정보 컬럼들
         val proj = arrayOf(
             MediaStore.Audio.Media._ID,     // 음악 정보 ID
-            MediaStore.Audio.Media.TITLE,   // 음악 타이틀
-            MediaStore.Audio.Media.ARTIST,  // 음악 아티스트
-            MediaStore.Audio.Media.ALBUM_ID,    // 음악 앨범 ID
-            MediaStore.Audio.Media.DURATION    // 음악 길이
+            MediaStore.Audio.Media.TITLE,   // 타이틀
+            MediaStore.Audio.Media.ARTIST,  // 아티스트
+            MediaStore.Audio.Media.ALBUM_ID,    // 앨범 ID
+            MediaStore.Audio.Media.DURATION,    // 길이
+            MediaStore.Audio.Media.ALBUM,   // 앨범명
+            MediaStore.Audio.Media.TRACK    // 트랙 번호
         )
 
         // content resolver 쿼리에 Uri, 음원 정보 컬럼
@@ -201,8 +213,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             var albumId = cursor.getString(3)
             var duration = cursor.getLong(4)
             var favorites = 0
+            var albumName = cursor.getString(5).replace("'", "")
+            var track = cursor.getString(6)
 
-            val music = Music(id, title, artist, albumId, duration, favorites)
+            val music = Music(id, title, artist, albumId, duration, favorites, albumName, track)
             musicList?.add(music)
         }
         cursor!!.close()
@@ -210,17 +224,38 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     // 데이터 삭제를 리사이클러뷰에 반영
+    @SuppressLint("NotifyDataSetChanged")
     fun deleteMusic(position: Int): MutableList<Music>? {
         var playList: MutableList<Music>? = mutableListOf<Music>()
         playList = dbHelper.selectAllData()
-        Log.d("log", "삭제하라고 전달한 title: ${playList[position].title} id: ${playList[position].id}")
-        if(dbHelper.deleteData(playList[position].id)) {
-            Toast.makeText(this, "${playList[position].title} 삭제", Toast.LENGTH_LONG).show()
-            playList.removeAt(position)
-        }else {
-            Toast.makeText(this, "${playList[position].title} 삭제 실패", Toast.LENGTH_LONG).show()
+        var dialog = Dialog(applicationContext)
+
+        // 다이얼로그 이벤트 핸들러 등록
+        val eventHandler = object: DialogInterface.OnClickListener{
+            override fun onClick(p0: DialogInterface?, p1: Int) {
+                when(p1){
+                    DialogInterface.BUTTON_POSITIVE -> {
+                        if(dbHelper.deleteData(playList[position].id)) {
+                            Toast.makeText(this@MainActivity, "${playList[position].title} 삭제", Toast.LENGTH_LONG).show()
+                            playList.removeAt(position)
+                            binding.recyclerview.adapter!!.notifyDataSetChanged()
+                        }else {
+                            Toast.makeText(this@MainActivity, "${playList[position].title} 삭제 실패", Toast.LENGTH_LONG).show()
+                        }
+                        binding.recyclerview.adapter = RecyclerAdapter(this@MainActivity, playList)
+                        dialog.dismiss()
+                    }
+                    DialogInterface.BUTTON_NEGATIVE -> dialog.dismiss()
+                }
+            }
         }
-        binding.recyclerview.adapter = RecyclerAdapter(this@MainActivity, playList)
+
+        dialog = AlertDialog.Builder(this).run {
+            setMessage("${playList[position].title} 삭제하시겠습니까?")
+            setPositiveButton("삭제", eventHandler)
+            setNegativeButton("취소", eventHandler)
+            show()
+        }
 
         return playList
     }
